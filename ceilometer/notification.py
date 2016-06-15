@@ -51,7 +51,7 @@ OPTS = [
                 default=False,
                 help='Save event details.'),
     cfg.BoolOpt('disable_non_metric_meters',
-                default=True,
+                default=False,
                 help='WARNING: Ceilometer historically offered the ability to '
                      'store events as meters. This usage is NOT advised as it '
                      'can flood the metering database and cause performance '

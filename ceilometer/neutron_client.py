@@ -128,3 +128,8 @@ class Client(object):
     def fw_policy_get_all(self):
         resp = self.client.list_firewall_policies()
         return resp.get('firewall_policies')
+
+    @logged
+    def fip_get_all(self):
+        fips = self.client.list_floatingips()['floatingips']
+        return fips

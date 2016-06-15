@@ -3,7 +3,7 @@ sources:
     - name: meter_source
       interval: 600
       meters:
-          - "*"
+          - "!ip.floating"
       sinks:
           - meter_sink
     - name: cpu_source
@@ -35,6 +35,12 @@ sources:
           - "network.outgoing.packets"
       sinks:
           - network_sink
+    - name: floating_source
+      interval: 600
+      meters:
+          - "ip.floating"
+      sinks:
+          - meter_sink
 sinks:
     - name: meter_sink
       transformers:
