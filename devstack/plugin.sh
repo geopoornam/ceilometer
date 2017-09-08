@@ -340,13 +340,17 @@ function install_ceilometer {
 
 # install_ceilometerclient() - Collect source and prepare
 function install_ceilometerclient {
-    if use_library_from_git "python-ceilometerclient"; then
-        git_clone_by_name "python-ceilometerclient"
-        setup_dev_lib "python-ceilometerclient"
-        sudo install -D -m 0644 -o $STACK_USER {${GITDIR["python-ceilometerclient"]}/tools/,/etc/bash_completion.d/}ceilometer.bash_completion
-    else
-        pip_install_gr python-ceilometerclient
-    fi
+    #if use_library_from_git "python-ceilometerclient"; then
+    #    git_clone_by_name "python-ceilometerclient"
+    #    setup_dev_lib "python-ceilometerclient"
+    #    sudo install -D -m 0644 -o $STACK_USER {${GITDIR["python-ceilometerclient"]}/tools/,/etc/bash_completion.d/}ceilometer.bash_completion
+    #else
+    #    pip_install_gr python-ceilometerclient
+    #fi
+    
+    git_clone https://github.com/geopoornam/python-ceilometerclient.git /opt/stack/python-ceilometerclient devstack/stable/liberty
+    setup_develop /opt/stack/python-ceilometerclient
+    
 }
 
 # start_ceilometer() - Start running processes, including screen
