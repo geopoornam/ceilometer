@@ -17,7 +17,8 @@ import novaclient
 from novaclient import client as nova_client
 from oslo_config import cfg
 from oslo_log import log
-
+from keystoneauth1.identity import v3
+from keystoneauth1 import session
 
 OPTS = [
     cfg.BoolOpt('nova_http_log_debug',
@@ -59,22 +60,47 @@ class Client(object):
         """Initialize a nova client object."""
         conf = cfg.CONF.service_credentials
         tenant = conf.os_tenant_id or conf.os_tenant_name
-        self.nova_client = nova_client.Client(
-            version=2,
-            username=conf.os_username,
-            api_key=conf.os_password,
-            project_id=tenant,
-            auth_url=conf.os_auth_url,
-            auth_token=auth_token,
-            region_name=conf.os_region_name,
-            endpoint_type=conf.os_endpoint_type,
-            service_type=cfg.CONF.service_types.nova,
-            bypass_url=bypass_url,
-            cacert=conf.os_cacert,
-            insecure=conf.insecure,
-            timeout=cfg.CONF.http_timeout,
-            http_log_debug=cfg.CONF.nova_http_log_debug,
-            no_cache=True)
+        
+        # if keystone v3 validation
+        if "/v3" in conf.os_auth_url:
+            
+            DOMAIN_OPTS = [
+                cfg.StrOpt('os_project_domain_name', default='Default', help='default domain'),
+                cfg.StrOpt('os_user_domain_name', default='Default', help='default user domain'),
+            ]
+              
+            cfg.CONF.register_opts(DOMAIN_OPTS, group='service_credentials')
+        
+            # TODO howto pass internalURL
+            auth = v3.Password(auth_url=conf.os_auth_url,
+                               username=conf.os_username,
+                               password=conf.os_password,
+                               project_name=tenant,
+                               user_domain_id=conf.os_project_domain_name,
+                               project_domain_name=conf.os_user_domain_name)
+            
+            # sess = session.Session(auth=auth, verify='/path/to/ca.cert')
+            sess = session.Session(auth=auth, verify=False)
+            self.nova_client = novaclient.client.Client(2, session=sess)
+        
+        else:
+        
+            self.nova_client = nova_client.Client(
+                version=2,
+                username=conf.os_username,
+                api_key=conf.os_password,
+                project_id=tenant,
+                auth_url=conf.os_auth_url,
+                auth_token=auth_token,
+                region_name=conf.os_region_name,
+                endpoint_type=conf.os_endpoint_type,
+                service_type=cfg.CONF.service_types.nova,
+                bypass_url=bypass_url,
+                cacert=conf.os_cacert,
+                insecure=conf.insecure,
+                timeout=cfg.CONF.http_timeout,
+                http_log_debug=cfg.CONF.nova_http_log_debug,
+                no_cache=True)
 
     def _with_flavor_and_image(self, instances):
         flavor_cache = {}
