@@ -63,21 +63,14 @@ class Client(object):
         
         # if keystone v3 validation
         if "/v3" in conf.os_auth_url:
-            
-            DOMAIN_OPTS = [
-                cfg.StrOpt('os_project_domain_name', default='Default', help='default domain'),
-                cfg.StrOpt('os_user_domain_name', default='Default', help='default user domain'),
-            ]
-              
-            cfg.CONF.register_opts(DOMAIN_OPTS, group='service_credentials')
         
             # TODO howto pass internalURL
             auth = v3.Password(auth_url=conf.os_auth_url,
                                username=conf.os_username,
                                password=conf.os_password,
                                project_name=tenant,
-                               user_domain_id=conf.os_project_domain_name,
-                               project_domain_name=conf.os_user_domain_name)
+                               user_domain_name=conf.os_user_domain_name,
+                               project_domain_name=conf.os_project_domain_name)
             
             # sess = session.Session(auth=auth, verify='/path/to/ca.cert')
             sess = session.Session(auth=auth, verify=False)

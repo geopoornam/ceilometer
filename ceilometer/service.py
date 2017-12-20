@@ -78,6 +78,8 @@ CLI_OPTS = [
                 default=False,
                 help='Disables X.509 certificate validation when an '
                      'SSL connection to Identity Service is established.'),
+    cfg.StrOpt('os_project_domain_name', default='Default', help='Default domain'),
+    cfg.StrOpt('os_user_domain_name', default='Default', help='Default user domain'),
 ]
 
 cfg.CONF.register_cli_opts(CLI_OPTS, group="service_credentials")
